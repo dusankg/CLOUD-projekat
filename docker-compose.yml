@@ -1,9 +1,9 @@
 version: '3'
 
 services:     
-  database:
+  database1:
     image: 'postgres:latest'
-    container_name: postgres
+    container_name: postgres1
     restart: on-failure
     hostname: postgres
     networks:
@@ -12,23 +12,62 @@ services:
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=cloud_db 
-    expose:
-      - 5432
     volumes:
-      - database:/var/lib/postgresql/data
+      - database1:/var/lib/postgresql/data
 
-  app:
+  database2:
+    image: 'postgres:latest'
+    container_name: postgres2
+    restart: on-failure
+    hostname: postgres
+    networks:
+      - localhost
+    environment:
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=cloud_db 
+    volumes:
+      - database2:/var/lib/postgresql/data
+
+
+  app1:
     image: 'docker-spring-boot-postgres:latest'
     build:
       context: .
-    container_name: app
+    container_name: app1
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
-      - database
+      - database1
     environment:
       - DBUSERNAME=postgres
       - DBPASSWORD=admin
+      - HOST=host1
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=admin
+      - DATABASE_DOMAIN=postgres
+      - DATABASE_SCHEMA=cloud_db
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/cloud_db
+    restart: on-failure
+    tty: true
+    networks:
+      - localhost
+    volumes:
+      - $HOME/.m2:/root/.m2
+
+  app2:
+    image: 'docker-spring-boot-postgres:latest'
+    build:
+      context: .
+    container_name: app2
+    ports:
+      - "8082:8080"
+    depends_on:
+      - database2
+    environment:
+      - DBUSERNAME=postgres
+      - DBPASSWORD=admin
+      - HOST=host2
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=admin
       - DATABASE_DOMAIN=postgres
@@ -41,8 +80,21 @@ services:
     volumes:
       - $HOME/.m2:/root/.m2
       
+  nginx-server:
+    build: ./nginx
+    container_name: nginx-server
+    networks:
+      - localhost
+    ports:
+      - 8080:80
+    depends_on: 
+      - app1
+      - app2
+
+
 volumes:
-  database:
+  database1:
+  database2:
 
 networks:
         localhost:
