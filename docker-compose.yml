@@ -1,0 +1,49 @@
+version: '3'
+
+services:     
+  database:
+    image: 'postgres:latest'
+    container_name: postgres
+    restart: on-failure
+    hostname: postgres
+    networks:
+      - localhost
+    environment:
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=cloud_db 
+    expose:
+      - 5432
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  app:
+    image: 'docker-spring-boot-postgres:latest'
+    build:
+      context: .
+    container_name: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    environment:
+      - DBUSERNAME=postgres
+      - DBPASSWORD=admin
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=admin
+      - DATABASE_DOMAIN=postgres
+      - DATABASE_SCHEMA=cloud_db
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/cloud_db
+    restart: on-failure
+    tty: true
+    networks:
+      - localhost
+    volumes:
+      - $HOME/.m2:/root/.m2
+      
+volumes:
+  database:
+
+networks:
+        localhost:
+                driver: bridge
