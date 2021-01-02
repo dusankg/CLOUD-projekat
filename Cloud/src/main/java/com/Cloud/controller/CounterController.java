@@ -1,5 +1,6 @@
 package com.Cloud.controller;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,12 +24,25 @@ public class CounterController {
 	@GetMapping()
 	public String getTestData() {
 		List<Counter> counters = (List<Counter>) repo.findAll();
-		Counter c = counters.get(0);
+		
+		Counter c;
+		if (counters.size() == 0) {
+			c = new Counter();
+			c.setId(1L);
+			c.setBrojac(0);
+		} else {
+			c = counters.get(0);
+		}
+		
 		Integer number = c.getBrojac();
 		number=number+1;
 		c.setBrojac(number);
 		repo.save(c);
+		
+        Map<String, String> env = System.getenv();
+        
+        System.out.println(env.get("HOST"));
 			
-	    return new String(number.toString());
+	    return new String("Brojac: " + number.toString() + "</br>Host: " + env.get("HOST"));
 	}	
 }
