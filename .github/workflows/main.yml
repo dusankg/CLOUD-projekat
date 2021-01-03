@@ -3,7 +3,9 @@ name: ci
 
 on:
   push:
-    branches: action-test
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   multi:
