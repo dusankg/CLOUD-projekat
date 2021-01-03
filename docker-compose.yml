@@ -86,7 +86,7 @@ services:
     networks:
       - localhost
     ports:
-      - 8083:80
+      - 8084:80
     depends_on: 
       - app1
       - app2
