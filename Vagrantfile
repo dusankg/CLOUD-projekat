@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "file", source: "Dockerfile", destination: "Dockerfile"
   config.vm.provision "file", source: "docker-compose.yml", destination: "docker-compose.yml"
-  config.vm.network "forwarded_port", guest: 8083, host: 8083
+  config.vm.network "forwarded_port", guest: 8083, host: 8089
 
   
   config.vm.provision :shell, path: "script.sh"
